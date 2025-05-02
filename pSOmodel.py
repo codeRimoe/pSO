@@ -14,7 +14,10 @@ from abc import ABC, abstractmethod
 import numpy as np
 import torch
 from torch import nn
-import torch.nn.functional as F 
+import torch.nn.functional as F
+
+from scipy.sparse import coo_array
+
 # from torch import optim
 
 import random
@@ -38,7 +41,15 @@ class OptProblem(nn.Module, ABC):
             self.register_buffer(f'dvMask-{i}', torch.tensor(dvMask[i], dtype=torch.float32, requires_grad=False).unsqueeze(-1))
             self.DV['mask'] += [i]
         for i in Ws:
-            self.register_buffer(f'W-{i}', torch.tensor(Ws[i], dtype=torch.float32, requires_grad=False))
+            if type(Ws[i]) is coo_array:
+                Wsi = torch.sparse_coo_tensor(
+                    indices=np.array([Ws[i].col, Ws[i].row]).T,
+                    values=Ws[i].data.astype(np.float32),
+                    size=Ws[i].shape[::-1]
+                )
+            else:
+                Wsi = torch.tensor(Ws[i], dtype=torch.float32, requires_grad=False)
+            self.register_buffer(f'W-{i}', Wsi)
 
         for key in DV:
             dv = DV[key]
@@ -143,6 +154,7 @@ class OptProblem(nn.Module, ABC):
     def forward(self):
         DVx = self.softMaskDV()
         objs, cons = self.calObj(DVx)
+        objs, cons = torch.stack(objs), torch.stack(cons)
         objs = (objs - self['norm-Obj-Bias']) / self['norm-Obj-Scale']
         cons = (cons - self['norm-Con-Bias']) / self['norm-Con-Scale']
         return objs, cons
