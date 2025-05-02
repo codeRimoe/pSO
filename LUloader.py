@@ -27,7 +27,7 @@ from matplotlib.colors import ListedColormap
 
 def vplot_cate(gdf, cates, vmin, vmax, ax, cmap, lmap, legend, legend_kwds):
     pmarks = []
-    for cate in range(vmin, vmax):
+    for cate in range(vmin, vmax + 1):
         color = cmap[cate]
         label = lmap[cate]
         lus = gdf[cates == cate]
@@ -39,7 +39,14 @@ def vplot_cate(gdf, cates, vmin, vmax, ax, cmap, lmap, legend, legend_kwds):
     if legend:
         handles, _ = ax.get_legend_handles_labels()
         # TODO: ncol here need to be gneralized
-        ax.legend(handles=[*handles, *pmarks], ncol=9, **legend_kwds)
+        ax.legend(handles=[*handles, *pmarks], ncol=len(pmarks), **legend_kwds)
+
+def rplot_cate(im, vmin, vmax, ax, cmap, lmap, legend, legend_kwds):
+    imx = ax.imshow(im, cmap=cmap, vmin=vmin, vmax=vmax + 1, interpolation='none')
+    # TODO:legend
+    if legend:
+        cbar = plt.colorbar(imx, ax=ax, cmap=cmap, **legend_kwds)
+        cbar.set_ticks(ticks=[v + .5 for v in range(vmin, vmax + 1)], labels=lmap)
 
 def read_tif(filename, resample=1):
     ds = gdal.Open(filename)
@@ -227,9 +234,9 @@ class LUloader:
     def new_plot(self, ax=None, figsize=(5, 5), bg=None, **bgarg):
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
-            ax.axis('off')
         else:
             fig = None
+        ax.axis('off')
         if bg is not None:
             bg.plot(ax=ax, **bgarg)
         return fig, ax
@@ -275,49 +282,58 @@ class LUloader:
             except:
                 lmap = None
 
-        # if legend is None:
-        #     print('Use default legend.')
-        #     legend = lgend
+        if type(legend) is bool:
+            legend_kwds = {}
+        else:
+            legend_kwds = legend
+            legend = True
         if self.VorR == 'V':
             try:
                 # TODO: ncol here need to be gneralized
-                vplot_cate(self.var, LU, vmin=vmin, vmax=vmax + 1, ax=ax, cmap=cmap, lmap=lmap, legend=bool(legend), legend_kwds=legend)
-                # self.var.plot(LU, categorical=True, label=label, ax=ax, cmap=cmap, vmin=0, vmax=M, legend=bool(legend), legend_kwds=legend) # TODO: legend
+                vplot_cate(self.var, LU, vmin=vmin, vmax=vmax, ax=ax, cmap=cmap, lmap=lmap, legend=legend, legend_kwds=legend_kwds)
             except:
-                vplot_cate(self.raw, LU, vmin=vmin_, vmax=vmax_ + 1, ax=ax, cmap=cmap, lmap=lmap, legend=bool(legend), legend_kwds=legend)
+                vplot_cate(self.raw, LU, vmin=vmin_, vmax=vmax_, ax=ax, cmap=cmap, lmap=lmap, legend=legend, legend_kwds=legend_kwds)
         elif self.VorR == 'R':
             try:
                 cmap = ListedColormap(cmap)
             except:
                 # print('Use default colormap.')
                 cmap = None
-            ax.imshow(LU, cmap=cmap, vmin=vmin, vmax=vmax, interpolation='none')
-            # TODO:legend
-            # plt.colorbar(ax=ax, ticks=[0,0.5, 1], orientation=legendOrient).set_ticklabels(legend)
+            try:
+                rplot_cate(LU, vmin=vmin, vmax=vmax, ax=ax, cmap=cmap, lmap=lmap, legend=legend, legend_kwds=legend_kwds)
+            except:
+                rplot_cate(LU, vmin=vmin_, vmax=vmax_, ax=ax, cmap=cmap, lmap=lmap, legend=legend, legend_kwds=legend_kwds)
         self.show_plot(fig, show=show, save_name=save_name, path=path)
-
+        return ax
 
     def plot_attr(self, attr, ax=None, figsize=(5, 5), bg=None, bgarg={},
-                  cmap=None, legend=None,
+                  vmm=None, cmap=None, legend=None,
                   show=True, save_name=None, path='plot'):
         
         fig, ax = self.new_plot(ax=ax, figsize=figsize, bg=bg, **bgarg)
-        if cmap is None:
-            try:
-                cmap = self.cmap
-            except:
-                cmap = None
-        vmin, vmax = 0, 1
+        if vmm is not None:
+            vmin, vmax = vmm
+        else:
+            vmin, vmax = None, None
+        
+        if type(legend) is dict:
+            legend_kwds = legend
+            legend = True
+        else:
+            legend_kwds = {}
+            legend = bool(legend)
         if self.VorR == 'V':
             try:
-                self.var.plot(attr, vmin=vmin, vmax=vmax, ax=ax, cmap=cmap, legend=bool(legend), legend_kwds=legend) # TODO: legend
+                self.var.plot(attr, vmin=vmin, vmax=vmax, ax=ax, cmap=cmap, legend=legend, legend_kwds=legend_kwds) # TODO: legend
             except:
-                self.raw.plot(attr, vmin=vmin, vmax=vmax, ax=ax, cmap=cmap, legend=bool(legend), legend_kwds=legend)
+                self.raw.plot(attr, vmin=vmin, vmax=vmax, ax=ax, cmap=cmap, legend=legend, legend_kwds=legend_kwds)
         elif self.VorR == 'R':
-            ax.imshow(attr, cmap=cmap)
+            imx = ax.imshow(attr, vmin=vmin, vmax=vmax, cmap=cmap)
             # TODO:legend
-            # plt.colorbar(ax=ax, ticks=[0,0.5, 1], orientation=legendOrient).set_ticklabels(legend)
+            if legend:
+                plt.colorbar(imx, ax=ax, cmap=cmap, **legend_kwds)
         self.show_plot(fig, show=show, save_name=save_name, path=path)
+        return ax
 
 
 # %%
