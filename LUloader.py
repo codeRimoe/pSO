@@ -282,11 +282,12 @@ class LUloader:
             except:
                 lmap = None
 
-        if type(legend) is bool:
-            legend_kwds = {}
-        else:
+        if type(legend) is dict:
             legend_kwds = legend
             legend = True
+        else:
+            legend_kwds = {}
+            legend = bool(legend)
         if self.VorR == 'V':
             try:
                 # TODO: ncol here need to be gneralized
