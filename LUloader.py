@@ -249,7 +249,7 @@ class LUloader:
                 os.makedirs(path, exist_ok=True)
                 fig.savefig(os.path.join(path, save_name))
             if show:
-                fig.show()
+                # fig.show()
                 plt.show()
 
     def plot_pLU(self, pLU=None, **kwargs):
