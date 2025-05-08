@@ -6,6 +6,7 @@ This is an implementation of the probabilistic framework with the probabilistic 
 
 We provide the open-source code and data for the paper here.
 
+[LUO1_202405_LCG.pptx](https://mycuhk-my.sharepoint.com/:p:/g/personal/1155130067_link_cuhk_edu_hk/Eb0AMFtpggZArJj5UMlyluMBLfeJkNhCjkR3UaTfj-wTsQ?e=20vgah)
 
 
 Please cite our article:
