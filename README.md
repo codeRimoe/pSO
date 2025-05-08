@@ -6,9 +6,6 @@ This is an implementation of the probabilistic framework with the probabilistic 
 
 We provide the open-source code and data for the paper here.
 
-[LUO1_202405_LCG.pptx](https://mycuhk-my.sharepoint.com/:p:/g/personal/1155130067_link_cuhk_edu_hk/Eb0AMFtpggZArJj5UMlyluMBLfeJkNhCjkR3UaTfj-wTsQ?e=20vgah)
-
-
 Please cite our article:
 
 > Haowen Luo & Bo Huang (2023) A probabilistic framework with the gradient-based method for multi-objective land use optimization, International Journal of Geographical Information Science, (In production) DOI: 10.1080/13658816.2023.2178001
