@@ -61,7 +61,7 @@ def Eval(self, LU):
 
     w = eta(p)
 
-    gdp = np.sum(LU * self.W_['UUM'][0] * w, axis=-1)
+    gdp = np.sum(LU * self.W_['UUM'][0] * w, axis=-1) * (1 - self.W_['gdp'])
     eco = np.sum(LU * self.W_['UUM'][1], axis=-1) * (1 - self.W_['eco'])
 
     Gdp = -np.sum(gdp)

@@ -33,9 +33,8 @@ def vplot_cate(gdf, cates, vmin, vmax, ax, cmap, lmap, legend, legend_kwds):
         lus = gdf[cates == cate]
         if len(lus) > 0:
             lus.plot(ax=ax, color=color)
-        elif cate == 0:
-            continue
-        pmarks.append(Patch(facecolor=color, label=label))
+        if bool(label):
+            pmarks.append(Patch(facecolor=color, label=label))
     if legend:
         handles, _ = ax.get_legend_handles_labels()
         # TODO: ncol here need to be gneralized
@@ -241,24 +240,30 @@ class LUloader:
             bg.plot(ax=ax, **bgarg)
         return fig, ax
     
-    def show_plot(self, fig, show=True, save_name=None, path='plot'):
+    def show_plot(self, fig, show=True, save_name=None, dpi=300, path='plot'):
+        # add ":" befor path to not relative to project file
         if fig is not None:
             fig.tight_layout()
             if save_name is not None:
-                path = os.path.join(self.path, path)
+                if path[0] == ':':
+                    path = path[1:]
+                else:
+                    path = os.path.join(self.path, path)
                 os.makedirs(path, exist_ok=True)
-                fig.savefig(os.path.join(path, save_name))
+                fig.savefig(os.path.join(path, save_name), dpi=dpi)
             if show:
                 # fig.show()
                 plt.show()
+            else:
+                plt.close()
 
     def plot_pLU(self, pLU=None, **kwargs):
         LU = self.cate_LU(pLU)
-        self.plot_LU(LU=LU, **kwargs)
+        return self.plot_LU(LU=LU, **kwargs)
 
     def plot_LU(self, LU=None, ax=None, figsize=(5, 5), bg=None, bgarg={},
                 vmm=None, cmap=None, lmap=None, legend=None,
-                show=True, save_name=None, path='plot'):
+                show=True, save_name=None, dpi=300, path='plot'):
         LU = self.to_LU(LU)
         vmin_, vmax_ = LU.min(), LU.max()
         fig, ax = self.new_plot(ax=ax, figsize=figsize, bg=bg, **bgarg)
@@ -304,12 +309,12 @@ class LUloader:
                 rplot_cate(LU, vmin=vmin, vmax=vmax, ax=ax, cmap=cmap, lmap=lmap, legend=legend, legend_kwds=legend_kwds)
             except:
                 rplot_cate(LU, vmin=vmin_, vmax=vmax_, ax=ax, cmap=cmap, lmap=lmap, legend=legend, legend_kwds=legend_kwds)
-        self.show_plot(fig, show=show, save_name=save_name, path=path)
+        self.show_plot(fig, show=show, save_name=save_name, dpi=dpi, path=path)
         return ax
 
     def plot_attr(self, attr, ax=None, figsize=(5, 5), bg=None, bgarg={},
                   vmm=None, cmap=None, legend=None,
-                  show=True, save_name=None, path='plot'):
+                  show=True, save_name=None, dpi=300, path='plot'):
         
         fig, ax = self.new_plot(ax=ax, figsize=figsize, bg=bg, **bgarg)
         if vmm is not None:
@@ -333,7 +338,7 @@ class LUloader:
             # TODO:legend
             if legend:
                 plt.colorbar(imx, ax=ax, cmap=cmap, **legend_kwds)
-        self.show_plot(fig, show=show, save_name=save_name, path=path)
+        self.show_plot(fig, show=show, save_name=save_name, dpi=dpi, path=path)
         return ax
 
 
