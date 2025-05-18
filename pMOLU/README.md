@@ -35,8 +35,8 @@ Here, we release two datasetsof land use optimization:
    * `model.py`: Implementation of MOLU model for GA and pMOLU model for GDA.
    * `objs_sim.py`: Objective functions for the simulation data experiment.
    * `objs.py`: Objective functions for Guangming case study.
-   * `Opt_GMcaseGA.py`: The main code for optimization using GA in Guangming case study.
-   * `Opt_GMcaseGDA.ipynb`: The main code for optimization using GDA in Guangming case study.
+   * `Opt_GMcaseGDA.py`: The main code for optimization using GDA in Guangming case study.
+   * `Opt_GMcaseGDA.ipynb`: The main code for optimization using GDA in Guangming case study (notebook).
    * `Opt_SimExpGA.py`: The main code for optimization using GA in simulation data experiment.
    * `Opt_SimExpGDA.py`: The main code for optimization using GDA in simulation data experiment.
 3. ##### The simulation data experiment
